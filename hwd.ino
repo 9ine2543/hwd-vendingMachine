@@ -24,7 +24,7 @@ unsigned long currentTime = millis();
 // Previous time
 unsigned long previousTime = 0; 
 // Define timeout time in milliseconds (example: 2000ms = 2s)
-const long timeoutTime = 2000;
+const long timeoutTime = 5000;
 
 
 
@@ -154,7 +154,7 @@ void setup() {
   uint8_t qrcodeData[qrcode_getBufferSize(3)];
   qrcode_initText(&qrcode, qrcodeData, 3, 0, WiFi.localIP().toString().c_str());
   Serial.println(qrcode.size);
-  display.drawBitmap(3, 3, myBitmap, 128, 64, 1);
+  display.drawBitmap(0, 0, myBitmap, 128, 64, 1);
   display.display();
 
 }
@@ -172,7 +172,7 @@ void loop() {
       if (client.available()) {             // if there's bytes to read from the client,
         char c = client.read();             // read a byte, then
         Serial.write(c);
-        // delay(10);                    // print it out the serial monitor
+        delay(1);                    // print it out the serial monitor
         header += c;
         if (c == '\n') {                    // if the byte is a newline character
           // if the current line is blank, you got two newline characters in a row.
