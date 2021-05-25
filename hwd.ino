@@ -8,8 +8,8 @@
 #include <WiFi.h>
 #include <ESPmDNS.h>
 
-const char* ssid = "Haruk";
-const char* password = "10001000";
+const char *ssid = "Haruk";
+const char *password = "10001000";
 
 // Set web server port number to 80
 WiFiServer server(80);
@@ -28,8 +28,8 @@ const long timeoutTime = 5000;
 
 const int led = 2;
 
-#define SCREEN_WIDTH 128  // OLED display width, in pixels
-#define SCREEN_HEIGHT 64  // OLED display height, in pixels
+#define SCREEN_WIDTH 128 // OLED display width, in pixels
+#define SCREEN_HEIGHT 64 // OLED display height, in pixels
 
 // set the LCD number of columns and rows
 int lcdColumns = 16;
@@ -37,8 +37,8 @@ int lcdRows = 2;
 
 LiquidCrystal_I2C lcd(0x3F, lcdColumns, lcdRows);
 
-#define OLED_RESET -1        // Reset pin # (or -1 if sharing Arduino reset pin)
-#define SCREEN_ADDRESS 0x3C  ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
+#define OLED_RESET -1       // Reset pin # (or -1 if sharing Arduino reset pin)
+#define SCREEN_ADDRESS 0x3C ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
 
 #define OLED_SDA 21
 #define OLED_SCL 22
@@ -46,23 +46,25 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 QRCode qrcode;
 
-String text[] = { "Welcome <3", "Delivering...", "Select your item", "Item delivered!", "Temp. Closed" };
+String text[] = {"Welcome <3", "Delivering...", "Select your item", "Item delivered!", "Temp. Closed"};
 
-void setup() {
+void setup()
+{
   Serial.begin(115200);
 
   pinMode(output2, OUTPUT);
   digitalWrite(output2, LOW);
 
   // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
-  if (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
+  if (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS))
+  {
     Serial.println(F("SSD1306 allocation failed"));
     for (;;)
-      ;  // Don't proceed, loop forever
+      ; // Don't proceed, loop forever
   }
 
   display.display();
-  delay(1000);  // Pause for 2 seconds
+  delay(1000); // Pause for 2 seconds
 
   // Clear the buffer
   display.clearDisplay();
@@ -82,7 +84,8 @@ void setup() {
   Serial.print("Connecting to ");
   Serial.println(ssid);
   WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
+  while (WiFi.status() != WL_CONNECTED)
+  {
     delay(500);
     Serial.print(".");
   }
@@ -93,117 +96,154 @@ void setup() {
   Serial.println(WiFi.localIP());
   server.begin();
   uint8_t qrcodeBytes[qrcode_getBufferSize(2)];
-  qrcode_initText(&qrcode, qrcodeBytes, 2, ECC_LOW,("http://" + WiFi.localIP().toString()).c_str());
+  qrcode_initText(&qrcode, qrcodeBytes, 2, ECC_LOW, ("http://" + WiFi.localIP().toString()).c_str());
 
   display.clearDisplay();
-        /*
+  /*
          * QR-code ต้องมีพื้นที่สีสว่างกว่าตัว block ของ code เลยต้องถม background 
          * ส่วนที่จะแสดง QR-code ให้เป็นสีขาว (หน้าจอจะออกเป็นสีตามเม็ดสีบน oled ซึ่งคือสีฟ้า)
          */
-        display.fillRect(0,0,128,64, WHITE);
-        for (uint8_t y = 0; y < qrcode.size; y++) {
-          for (uint8_t x = 0; x < qrcode.size; x++) {
-            if (qrcode_getModule(&qrcode, x, y)) {
-              /*
+  display.fillRect(0, 0, 128, 64, WHITE);
+  for (uint8_t y = 0; y < qrcode.size; y++)
+  {
+    for (uint8_t x = 0; x < qrcode.size; x++)
+    {
+      if (qrcode_getModule(&qrcode, x, y))
+      {
+        /*
                * วาด Rectangle ขนาด 2x2 ในแต่ละตำแหน่งของ qrcode บนหน้าจอ 
                 โดยวางมุมซ้ายบนสุดของ QR-Code ไว้ที่พิกัด (39, 18)
                 */
-              display.fillRect(x*2 + 39, y*2 + 7, 2, 2, BLACK);
-            }
-          }
-          Serial.print("\n");
-        }
+        display.fillRect(x * 2 + 39, y * 2 + 7, 2, 2, BLACK);
+      }
+    }
+    Serial.print("\n");
+  }
 
   display.display();
 }
 
-void loop() {
-  WiFiClient client = server.available();  // Listen for incoming clients
+void loop()
+{
+  WiFiClient client = server.available(); // Listen for incoming clients
 
-  if (client) {  // If a new client connects,
+  if (client)
+  { // If a new client connects,
     currentTime = millis();
     previousTime = currentTime;
-    Serial.println("New Client.");                                             // print a message out in the serial port
-    String currentLine = "";                                                   // make a String to hold incoming data from the client
-    while (client.connected() && currentTime - previousTime <= timeoutTime) {  // loop while the client's connected
+    Serial.println("New Client."); // print a message out in the serial port
+    String currentLine = "";       // make a String to hold incoming data from the client
+    while (client.connected() && currentTime - previousTime <= timeoutTime)
+    { // loop while the client's connected
       currentTime = millis();
-      if (client.available()) {  // if there's bytes to read from the client,
-        char c = client.read();  // read a byte, then
+      if (client.available())
+      {                         // if there's bytes to read from the client,
+        char c = client.read(); // read a byte, then
         Serial.write(c);
-        delay(1);  // print it out the serial monitor
+        delay(1); // print it out the serial monitor
         header += c;
-        if (c == '\n') {  // if the byte is a newline character
+        if (c == '\n')
+        { // if the byte is a newline character
           // if the current line is blank, you got two newline characters in a row.
           // that's the end of the client HTTP request, so send a response:
-          if (currentLine.length() == 0) {
+          if (currentLine.length() == 0)
+          {
             // HTTP headers always start with a response code (e.g. HTTP/1.1 200 OK)
             // and a content-type so the client knows what's coming, then a blank line:
             client.println("HTTP/1.1 200 OK");
-            client.println("Content-type:text/html");
-            client.println("Connection: close");
-            client.println();
 
             // turns the GPIOs on and off
-            if (header.indexOf("GET /2/on") >= 0) {
-              Serial.println("GPIO 2 on");
-              output2State = "on";
-              digitalWrite(output2, HIGH);
-            } else if (header.indexOf("GET /2/off") >= 0) {
-              Serial.println("GPIO 2 off");
-              output2State = "off";
-              digitalWrite(output2, LOW);
-              // } else if (header.indexOf("GET /27/on") >= 0) {
-              //   Serial.println("GPIO 27 on");
-              //   output27State = "on";
-              //   digitalWrite(output27, HIGH);
-              // } else if (header.indexOf("GET /27/off") >= 0) {
-              //   Serial.println("GPIO 27 off");
-              //   output27State = "off";
-              //   digitalWrite(output27, LOW);
+            if (header.indexOf("/status") >= 0)
+            {
+              client.println("Content-type:application/json");
+              client.println("Connection: close");
+              client.println();
+              Serial.print(0b00001000); //check status
+              delay(300);
+              if (Serial.available())
+              {
+                int status = Serial.read();
+                if (status == (int)0b00011001) // ready
+                {
+                  client.println("{\"status\" : \"ready\" }");
+                  client.println();
+                }
+                else if (status == (int)0b01000000) // occupy
+                {
+                  client.println("{\"status\" : \"pending\" }");
+                  client.println();
+                }
+                else // error
+                {
+                  client.println("{\"status\" : \"error\" }");
+                  client.println();
+                }
+              }
             }
-
-            // Display the HTML web page--------------------------------------------------------------------------
-            client.println("<!DOCTYPE html><html>");
-            client.println("<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
-            client.println("<link rel=\"icon\" href=\"data:,\">");
-            // CSS to style the on/off buttons
-            // Feel free to change the background-color and font-size attributes to fit your preferences
-            client.println("<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}");
-            client.println(".button { background-color: #4CAF50; border: none; color: white; padding: 16px 40px;");
-            client.println("text-decoration: none; font-size: 30px; margin: 2px; cursor: pointer;}");
-            client.println(".button2 {background-color: #555555;}</style></head>");
-
-            // Web Page Heading
-            client.println("<body><h1>ESP32 Web Server</h1>");
-
-            // Display current state, and ON/OFF buttons for GPIO 26
-            client.println("<p>GPIO 26 - State " + output2State + "</p>");
-            // If the output26State is off, it displays the ON button
-            if (output2State == "off") {
-              client.println("<p><a href=\"/2/on\"><button class=\"button\">ON</button></a></p>");
-            } else {
-              client.println("<p><a href=\"/2/off\"><button class=\"button button2\">OFF</button></a></p>");
+            if (header.indexOf("/take") >= 0)
+            {
+              client.println("Content-type:application/json");
+              client.println("Connection: close");
+              Serial.print(0b00001000); //check status
+              delay(300);
+              if (Serial.available())
+              {
+                /* code */
+                int status = Serial.read();
+                if (status == (int)0b00011001) // ready
+                {
+                  if (header.indexOf("/take/1") >= 0) // get item 1
+                  {
+                    Serial.print(0b10001000);
+                  }
+                  else if (header.indexOf("/take/2") >= 0) // get item 2
+                  {
+                    Serial.print(0b10010000);
+                  }
+                  delay(300);
+                  int response = Serial.read();
+                  if (response == (int)0b10000000) //started
+                  {
+                    client.println("{\"status\" : \"started\" }");
+                    client.println();
+                  }
+                  else // error
+                  {
+                    client.println("{\"status\" : \"error\" }");
+                    client.println();
+                  }
+                }
+                else if (status == (int)0b01000000) // occupy
+                {
+                  client.println("{\"status\" : \"pending\" }");
+                  client.println();
+                }
+                else // error
+                {
+                  client.println("{\"status\" : \"error\" }");
+                  client.println();
+                }
+              }
             }
-
-            // Display current state, and ON/OFF buttons for GPIO 27
-            // client.println("<p>GPIO 27 - State " + output27State + "</p>");
-            // // If the output27State is off, it displays the ON button
-            // if (output27State=="off") {
-            //   client.println("<p><a href=\"/27/on\"><button class=\"button\">ON</button></a></p>");
-            // } else {
-            //   client.println("<p><a href=\"/27/off\"><button class=\"button button2\">OFF</button></a></p>");
-            // }
-            client.println("</body></html>");
-
-            // The HTTP response ends with another blank line
-            client.println();
-            // Break out of the while loop
+            else
+            {
+              // display page
+              client.println("Content-type:text/http");
+              client.println("Connection: close");
+              client.println();
+              client.println("<!DOCTYPE html>\n<html>\n\n<head>\n    <title>JIDO</title>\n    <meta charset='UTF-8'>\n    <script src='https://unpkg.com/axios/dist/axios.min.js'></script>\n    <link rel='preconnect' href='https://fonts.gstatic.com'>\n    <link href='https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap'\n        rel='stylesheet'>\n</head>\n\n<body>\n    <header>\n        <h1>\n            JIDO\n        </h1>\n    </header>\n    <section>\n        <div class='bar occupy'>\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07\u0e44\u0e21\u0e48\u0e27\u0e48\u0e32\u0e07</div>\n        <div class='zone'>\n            <div class='item-btn' onclick='itemSelect1(this)'>\n                <img src='https://backend.tops.co.th/media/catalog/product/8/8/8858998581153_1.jpg' alt='pepsi'>\n                <div>Pepsi</div>\n            </div>\n            <div class='item-btn' onclick='itemSelect2(this)'>\n                <img src='https://backend.tops.co.th/media/catalog/product/8/8/8851959132074_1.jpg' alt='coke'>\n                <div>Coca-Cola</div>\n            </div>\n        </div>\n    </section>\n    <footer>\n        <div>Computer Hardware Design</div>\n        <div>Computer Engineering KMITL 2021</div>\n    </footer>\n</body>\n\n<script>\n    function setReady() {\n        let noti = document.querySelector('.bar')\n        if (noti) {\n            noti.classList.remove('occupy')\n            noti.classList.remove('delivering')\n            noti.classList.add('ready')\n            noti.innerHTML = '\u0e1e\u0e23\u0e49\u0e2d\u0e21'\n        }\n    }\n    function setOccupy() {\n        let noti = document.querySelector('.bar')\n        if (noti) {\n            noti.classList.remove('ready')\n            noti.classList.remove('delivering')\n            noti.classList.add('occupy')\n            noti.innerHTML = '\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07\u0e44\u0e21\u0e48\u0e27\u0e48\u0e32\u0e07'\n        }\n    }\n    function setError() {\n        let noti = document.querySelector('.bar')\n        if (noti) {\n            noti.classList.remove('ready')\n            noti.classList.remove('delivering')\n            noti.classList.add('occupy')\n            noti.innerHTML = '\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07\u0e21\u0e35\u0e1b\u0e31\u0e0d\u0e2b\u0e32'\n        }\n    }\n    function setDelivering() {\n        let noti = document.querySelector('.bar')\n        if (noti) {\n            noti.classList.remove('occupy')\n            noti.classList.remove('ready')\n            noti.classList.add('delivering')\n            noti.innerHTML = '\u0e01\u0e33\u0e25\u0e31\u0e07\u0e08\u0e48\u0e32\u0e22\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32'\n        }\n    }\n    function isReady() {\n        let noti = document.querySelector('.bar')\n        if (noti && noti.classList.contains('ready')) {\n            return true\n        } else return false\n    }\n    function setDisable(id, state = true) {\n        let items = document.querySelectorAll('.item-btn')\n        if (items.length !== 0) {\n            let item = items[id - 1]\n            if (item) {\n                if (state === true) item.classList.add('disable')\n                else item.classList.remove('disable')\n            }\n        }\n    }\n\n    async function getStatus() {\n        const res = await fetch('http://%ip%/status')\n        const data = await res.json()\n        if (data.status === 'ready') {\n            setReady()\n        } else if (data.status === 'pending') {\n            setOccupy()\n        } else if (data.status === 'error') {\n            setError()\n        }\n        return data.status;\n    }\n    async function selectItem(num) {\n        const res = await fetch(`http://%ip%/take/${num}`)\n        const data = await res.json()\n        if (data.status === 'started') {\n            setDelivering()\n        } else if (data.status === 'pending') {\n            setOccupy()\n        } else if (data.status === 'error') {\n            setError()\n        }\n        return data.status;\n    }\n    async function itemSelect1(e) {\n        if (!e.classList.contains('disable')) {\n            console.log('select 1')\n            setDisable(1)\n            setDisable(2)\n            let status = await getStatus()\n            if (status === 'ready') {\n                setReady()\n                status = await selectItem(1)\n            } else if (status === 'pending') {\n                setOccupy()\n                status = await getStatus()\n            } else if (status === 'error') {\n                setError()\n            }\n            setDisable(1, false)\n            setDisable(2, false)\n        }\n    }\n    async function itemSelect2(e) {\n        if (!e.classList.contains('disable')) {\n            console.log('select 2')\n            setDisable(1)\n            setDisable(2)\n            let status = await getStatus()\n            if (status === 'ready') {\n                setReady()\n                status = await selectItem(2)\n            } else if (status === 'pending') {\n                setOccupy()\n            } else if (status === 'error') {\n                setError()\n            }\n            setDisable(1, false)\n            setDisable(2, false)\n        }\n    }\n</script>\n<style>\n    * {\n        margin: 0;\n        padding: 0;\n        font-family: 'Sarabun', sans-serif !important;\n        font-weight: 500;\n        color: #292929;\n        font-size: 40px;\n    }\n\n    body {\n        height: 100vh;\n        width: 100vw;\n        padding: 0;\n        margin: 0;\n        display: flex;\n        flex-flow: column;\n    }\n\n    header {\n        height: 7%;\n        width: 100%;\n        background: #ffe4bb;\n        display: flex;\n        justify-content: center;\n        align-items: center;\n    }\n\n    header h1 {\n        font-size: 50px;\n        color: #ff6d49;\n    }\n\n    section {\n        width: 100%;\n        flex: 1;\n        background: #fffaf7;\n        display: flex;\n        flex-flow: column;\n    }\n\n    footer {\n        margin-top: auto;\n        display: flex;\n        justify-content: center;\n        align-items: center;\n        flex-flow: column;\n        padding: 40px;\n        background: #ffe4bb;\n    }\n\n    footer div:last-child {\n        font-size: 30px;\n        color: #ff4c15;\n    }\n\n    .bar {\n        display: flex;\n        justify-content: center;\n        padding: 20px;\n    }\n\n    .bar.occupy {\n        background: rgb(247, 90, 90);\n        color: rgb(253, 218, 218);\n    }\n\n    .bar.ready {\n        background: rgb(32, 165, 54);\n        color: rgb(230, 255, 218);\n    }\n\n    .bar.delivering {\n        background: rgb(255, 198, 93);\n        color: rgb(160, 72, 0);\n    }\n\n    .zone {\n        display: flex;\n        flex-flow: column;\n        align-items: center;\n    }\n\n    .item-btn {\n        width: 80%;\n        background: #ffffff;\n        border-radius: 40px;\n        border: 2px solid #ff4c15;\n        padding: 20px;\n        margin-top: 70px;\n        display: flex;\n        flex-flow: column;\n        align-items: center;\n    }\n\n    .item-btn>img {\n        height: 500px;\n        margin-bottom: 15px;\n    }\n\n    .disable {\n        filter: blur(4px);\n    }\n</style>\n\n</html>");
+              client.println();
+            }
             break;
-          } else {  // if you got a newline, then clear currentLine
+          }
+          else
+          { // if you got a newline, then clear currentLine
             currentLine = "";
           }
-        } else if (c != '\r') {  // if you got anything else but a carriage return character,
-          currentLine += c;      // add it to the end of the currentLine
+        }
+        else if (c != '\r')
+        {                   // if you got anything else but a carriage return character,
+          currentLine += c; // add it to the end of the currentLine
         }
       }
     }
@@ -215,16 +255,17 @@ void loop() {
     Serial.println("");
   }
 
-  for (int i; i < 5; i++) {
+  for (int i; i < 5; i++)
+  {
     showText(text[i]);
   }
 }
 
-void showText(String text) {
+void showText(String text)
+{
   lcd.setCursor(0, 0);
 
   lcd.print(text);
-
 
   delay(1000);
   lcd.clear();
