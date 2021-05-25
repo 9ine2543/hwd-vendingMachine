@@ -90,7 +90,7 @@
     }
 
     async function getStatus() {
-        const res = await fetch('http://%ip%/status')
+        const res = await fetch('http://#ip#/status')
         const data = await res.json()
         if (data.status === 'ready') {
             setReady()
@@ -102,7 +102,7 @@
         return data.status;
     }
     async function selectItem(num) {
-        const res = await fetch(`http://%ip%/take/${num}`)
+        const res = await fetch(`http://#ip#/take/${num}`)
         const data = await res.json()
         if (data.status === 'started') {
             setDelivering()
