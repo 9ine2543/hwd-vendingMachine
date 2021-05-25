@@ -90,13 +90,17 @@
     }
 
     async function getStatus() {
-        const res = await fetch('http://STEALURIP/status')
-        const data = await res.json()
-        if (data.status === 'ready') {
-            setReady()
-        } else if (data.status === 'pending') {
-            setOccupy()
-        } else if (data.status === 'error') {
+        try {
+            const res = await fetch('http://STEALURIP/status')
+            const data = await res.json()
+            if (data.status === 'ready') {
+                setReady()
+            } else if (data.status === 'pending') {
+                setOccupy()
+            } else if (data.status === 'error') {
+                setError()
+            }
+        } catch {
             setError()
         }
         return data.status;
