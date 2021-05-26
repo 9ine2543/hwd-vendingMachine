@@ -739,7 +739,7 @@ void loop()
     Serial.println(status, 2);
     if (action == "check")
     {
-      if (status == (int)0b00011001) // ready
+      if ((status >> 6) == 0) // ready
       {
         int item_1 = (int)status & 0b0111;
         int item_2 = ((int)status & 0b111000) >> 3;
@@ -749,7 +749,7 @@ void loop()
         temp_client->println(response.c_str());
         temp_client->println();
       }
-      else if (status == (int)0b01000000) // occupy
+      else if ((status >> 6) == 1) // occupy
       {
         int item_1 = (int)status & 0b0111;
         int item_2 = ((int)status & 0b111000) >> 3;
