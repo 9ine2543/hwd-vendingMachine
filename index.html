@@ -110,9 +110,8 @@
                 setOccupy()
             } else if (data[0] === 'error') {
                 setError()
-                return data[0];
-
             }
+            return data[0];
         } catch {
             setError()
             return "error"
