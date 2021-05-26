@@ -584,7 +584,6 @@ void setup()
 {
   Serial.begin(115200);
   Serial1.begin(10000);
-  Serial1.write(0b00001000);
   
   pinMode(output2, OUTPUT);
   digitalWrite(output2, LOW);
@@ -755,7 +754,7 @@ void loop()
     }
     }
   }
-  while (Serial1.available() && temp_client != NULL)
+  while (Serial1.available() && temp_client != NULL && action != "")
   {
     uint8_t status = Serial1.read();
     Serial.println(status, 2);
@@ -791,7 +790,7 @@ void loop()
     {
       if (status == (uint8_t)0b10000000) // ready
       {
-        temp_client->println("[\"ready\",0,0]");
+        temp_client->println("[\"started\",0,0]");
         temp_client->println();
       }
       else // error
@@ -800,6 +799,7 @@ void loop()
         temp_client->println();
       }
     }
+    action = "";
     temp_client->stop();
     temp_client = NULL;
   }
