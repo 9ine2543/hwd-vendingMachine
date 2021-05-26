@@ -122,8 +122,8 @@ char* c_html = "<!DOCTYPE html>\r\n"
    "ssList.add(\'occupy"
    "\')\r\n"
    "            noti.inn"
-   "erHTML = \'กำลังจ่าย"
-   "สินค้า\'\r\n"
+   "erHTML = \'เครื่องไม"
+   "่ว่าง\'\r\n"
    "        }\r\n"
    "    }\r\n"
    "    function setNoIt"
@@ -282,8 +282,6 @@ char* c_html = "<!DOCTYPE html>\r\n"
    "terval = 2000;\r\n"
    "    function interva"
    "ler() {\r\n"
-   "        isSelf = tru"
-   "e;\r\n"
    "        let id = set"
    "Interval(async () =>"
    " {\r\n"
@@ -356,6 +354,8 @@ char* c_html = "<!DOCTYPE html>\r\n"
    "                stat"
    "us = await selectIte"
    "m(1)\r\n"
+   "                isSe"
+   "lf = true;\r\n"
    "                setT"
    "imeout(() => {\r\n"
    "                    "
@@ -408,6 +408,8 @@ char* c_html = "<!DOCTYPE html>\r\n"
    "                stat"
    "us = await selectIte"
    "m(2)\r\n"
+   "                isSe"
+   "lf = true;\r\n"
    "                setT"
    "imeout(() => {\r\n"
    "                    "
@@ -712,7 +714,7 @@ void setup()
 
   display.display();
 }
-int count = 4;
+int count = 5;
 void loop()
 {
   while(Serial1.available() > 0 && count != 0){

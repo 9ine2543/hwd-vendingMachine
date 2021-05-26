@@ -51,7 +51,7 @@
             noti.classList.remove('ready')
             noti.classList.remove('delivering')
             noti.classList.add('occupy')
-            noti.innerHTML = 'กำลังจ่ายสินค้า'
+            noti.innerHTML = 'เครื่องไม่ว่าง'
         }
     }
     function setNoItem() {
@@ -124,7 +124,6 @@
     let isSelf = false;
     const stepper_interval = 2000;
     function intervaler() {
-        isSelf = true;
         let id = setInterval(async () => {
             status = await getStatus()
             if (status === 'ready' || status === 'error') {
@@ -157,6 +156,7 @@
             if (status === 'ready') {
                 setReady()
                 status = await selectItem(1)
+                isSelf = true;
                 setTimeout(() => {
                     intervaler()
                 }, 1000);
@@ -181,6 +181,7 @@
             if (status === 'ready') {
                 setReady()
                 status = await selectItem(2)
+                isSelf = true;
                 setTimeout(() => {
                     intervaler()
                 }, 1000);
