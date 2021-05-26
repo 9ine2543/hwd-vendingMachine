@@ -109,7 +109,7 @@
             } else if (data[0] === 'pending') {
                 if (isSelf) {
                     setDelivering()
-                }else{
+                } else {
                     setOccupy()
                 }
             } else if (data[0] === 'error') {
@@ -162,7 +162,9 @@
                 }, 1000);
             } else if (status === 'pending') {
                 setOccupy()
-                status = await getStatus()
+                setTimeout(() => {
+                    intervaler()
+                }, 1000);
             } else if (status === 'error') {
                 setError()
             }
@@ -184,7 +186,9 @@
                 }, 1000);
             } else if (status === 'pending') {
                 setOccupy()
-
+                setTimeout(() => {
+                    intervaler()
+                }, 1000);
             } else if (status === 'error') {
                 setError()
             }
