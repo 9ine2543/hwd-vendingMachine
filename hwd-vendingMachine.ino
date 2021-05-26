@@ -717,6 +717,7 @@ void loop()
                       client.println(response.c_str());
                       client.println();
                     }
+                    break;
                   }
                 }
               }
