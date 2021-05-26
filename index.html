@@ -100,26 +100,32 @@
 
     async function getStatus() {
         try {
+            await fetch('http://STEALURIP/status')
+            await fetch('http://STEALURIP/status')
             const res = await fetch('http://STEALURIP/status')
             const data = await res.json()
-            if (data.status === 'ready') {
+            if (data[0] === 'ready') {
                 setReady()
-            } else if (data.status === 'pending') {
+            } else if (data[0] === 'pending') {
                 setOccupy()
-            } else if (data.status === 'error') {
+            } else if (data[0] === 'error') {
                 setError()
             }
         } catch {
             setError()
         }
-        return data.status;
+        return data[0];
     }
     async function selectItem(num) {
-        const res = await fetch(`http://STEALURIP/take/${num}`)
-        const data = await res.json()
-        if (data[0] === 'started') {
-            setDelivering()
-        } else if (data[0] === 'error') {
+        try {
+            const res = await fetch(`http://STEALURIP/take/${num}`)
+            const data = await res.json()
+            if (data[0] === 'started') {
+                setDelivering()
+            } else if (data[0] === 'error') {
+                setError()
+            }
+        } catch {
             setError()
         }
         return data[0];
