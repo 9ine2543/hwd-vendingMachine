@@ -107,7 +107,11 @@
             if (data[0] === 'ready') {
                 setReady()
             } else if (data[0] === 'pending') {
-                setOccupy()
+                if (isSelf) {
+                    setDelivering()
+                }else{
+                    setOccupy()
+                }
             } else if (data[0] === 'error') {
                 setError()
             }
@@ -117,8 +121,10 @@
             return "error"
         }
     }
+    let isSelf = false;
     const stepper_interval = 2000;
     function intervaler() {
+        isSelf = true;
         let id = setInterval(async () => {
             status = await getStatus()
             if (status === 'ready' || status === 'error') {
@@ -177,6 +183,7 @@
                 }, 1000);
             } else if (status === 'pending') {
                 setOccupy()
+
             } else if (status === 'error') {
                 setError()
             }
