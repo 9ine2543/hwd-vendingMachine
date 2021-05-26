@@ -680,7 +680,7 @@ void loop()
         if (client.available())
         {                         // if there's bytes to read from the client,
           char c = client.read(); // read a byte, then
-          Serial.write(c);
+          //Serial.write(c);
           // delay(1); // print it out the serial monitor
           header += c;
           if (c == '\n')
@@ -759,13 +759,14 @@ void loop()
       }
     }
   }
-  while (Serial1.available() && count_trash != 0)
-  {
-    Serial1.read();
-    count_trash--;
-  }
+  
   while (Serial1.available() && temp_client != NULL && action != "")
   {
+    while (count_trash != 0)
+    {
+    Serial.println(Serial1.read(),2);
+    count_trash--;
+    }
     uint8_t status = Serial1.read();
     Serial.println(status, 2);
     if (action == "check")
