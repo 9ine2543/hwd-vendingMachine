@@ -801,6 +801,7 @@ void loop()
                 client.println(html.c_str());
 
                 client.println();
+                Serial.println("WEB");
               }
               break;
             }
@@ -819,13 +820,9 @@ void loop()
       header = "";
       // Close the connection
 
-      if (temp_client == NULL)
-      {
-        Serial.println("WEB");
-        client.stop();
-        Serial.println("Client disconnected.");
-        Serial.println("");
-      }
+      client.stop();
+      Serial.println("Client disconnected.");
+      Serial.println("");
     }
   }
 
