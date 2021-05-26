@@ -707,7 +707,7 @@ void loop()
                   if (Serial1.available() > 0)
                   {
                     int status = Serial1.read();
-                    Serial.print(status);
+                    Serial.print(status, 2);
                     if ((status >> 6) == 0) // ready
                     {
                       uint8_t item_1 = (uint8_t)status & 0b0111;
@@ -748,6 +748,7 @@ void loop()
                   if (Serial1.available() > 0)
                   {
                     int status = Serial1.read();
+                    Serial.print(status, 2);
                     if (status == (uint8_t)0b10000000) // ready
                     {
                       client.println("[\"started\",0,0]");
@@ -768,8 +769,25 @@ void loop()
                 client.println("Connection: close");
                 client.println();
                 Serial1.write(0b10010000);
-                temp_client = &client;
-                action = "take";
+                while (true)
+                {
+                  if (Serial1.available() > 0)
+                  {
+                    int status = Serial1.read();
+                    Serial.print(status, 2);
+                    if (status == (uint8_t)0b10000000) // ready
+                    {
+                      client.println("[\"started\",0,0]");
+                      client.println();
+                    }
+                    else // error
+                    {
+                      client.println("[\"error\",0,0]");
+                      client.println();
+                    }
+                    break;
+                  }
+                }
               }
               else
               {
