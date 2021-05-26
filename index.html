@@ -150,9 +150,9 @@
             if (status === 'ready') {
                 setReady()
                 status = await selectItem(1)
-                setTimeout(() => {
-                    intervaler()
-                }, 1000);
+                // setTimeout(() => {
+                //     intervaler()
+                // }, 1000);
             } else if (status === 'pending') {
                 setOccupy()
                 status = await getStatus()
@@ -172,9 +172,9 @@
             if (status === 'ready') {
                 setReady()
                 status = await selectItem(2)
-                setTimeout(() => {
-                    intervaler()
-                }, 1000);
+                // setTimeout(() => {
+                //     intervaler()
+                // }, 1000);
             } else if (status === 'pending') {
                 setOccupy()
             } else if (status === 'error') {
