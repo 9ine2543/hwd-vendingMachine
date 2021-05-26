@@ -707,6 +707,7 @@ void loop()
                   if (Serial1.available() > 0)
                   {
                     int status = Serial1.read();
+                    Serial.print(status);
                     if ((status >> 6) == 0) // ready
                     {
                       uint8_t item_1 = (uint8_t)status & 0b0111;
@@ -715,6 +716,21 @@ void loop()
                       response.replace("11item_111", String(item_1));
                       response.replace("11item_211", String(item_2));
                       client.println(response.c_str());
+                      client.println();
+                    }
+                    else if ((status >> 6) == 1) // occupy
+                    {
+                      uint8_t item_1 = (uint8_t)status & 0b0111;
+                      uint8_t item_2 = ((uint8_t)status & 0b111000) >> 3;
+                      String response = "[\"pending\",11item_111,11item_211]";
+                      response.replace("11item_111", String(item_1));
+                      response.replace("11item_211", String(item_2));
+                      client.println(response.c_str());
+                      client.println();
+                    }
+                    else // error
+                    {
+                      client.println("[\"error\",0,0]");
                       client.println();
                     }
                     break;
@@ -727,8 +743,24 @@ void loop()
                 client.println("Connection: close");
                 client.println();
                 Serial1.write(0b10001000);
-                temp_client = &client;
-                action = "take";
+                while (true)
+                {
+                  if (Serial1.available() > 0)
+                  {
+                    int status = Serial1.read();
+                    if (status == (uint8_t)0b10000000) // ready
+                    {
+                      client.println("[\"started\",0,0]");
+                      client.println();
+                    }
+                    else // error
+                    {
+                      client.println("[\"error\",0,0]");
+                      client.println();
+                    }
+                    break;
+                  }
+                }
               }
               else if (header.indexOf("/take/2") >= 0) // get item 2
               {
@@ -779,59 +811,59 @@ void loop()
     }
   }
 
-  if (Serial1.available() > 0)
-  {
-    if (temp_client != NULL && action != "")
-    {
-      uint8_t status = Serial1.read();
-      Serial.println(status, 2);
-      if (action == "check")
-      {
-        if ((status >> 6) == 0) // ready
-        {
-          uint8_t item_1 = (uint8_t)status & 0b0111;
-          uint8_t item_2 = ((uint8_t)status & 0b111000) >> 3;
-          String response = "[\"ready\",11item_111,11item_211]";
-          response.replace("11item_111", String(item_1));
-          response.replace("11item_211", String(item_2));
-          temp_client->println(response.c_str());
-          temp_client->println();
-        }
-        else if ((status >> 6) == 1) // occupy
-        {
-          uint8_t item_1 = (uint8_t)status & 0b0111;
-          uint8_t item_2 = ((uint8_t)status & 0b111000) >> 3;
-          String response = "[\"pending\",11item_111,11item_211]";
-          response.replace("11item_111", String(item_1));
-          response.replace("11item_211", String(item_2));
-          temp_client->println(response.c_str());
-          temp_client->println();
-        }
-        else // error
-        {
-          temp_client->println("[\"error\",0,0]");
-          temp_client->println();
-        }
-      }
-      else if (action == "take")
-      {
-        if (status == (uint8_t)0b10000000) // ready
-        {
-          temp_client->println("[\"started\",0,0]");
-          temp_client->println();
-        }
-        else // error
-        {
-          temp_client->println("[\"error\",0,0]");
-          temp_client->println();
-        }
-      }
-      action = "";
-      temp_client->stop();
-      Serial.println("api");
-      temp_client = NULL;
-    }
-  }
+  // if (Serial1.available() > 0)
+  // {
+  //   if (temp_client != NULL && action != "")
+  //   {
+  //     uint8_t status = Serial1.read();
+  //     Serial.println(status, 2);
+  //     if (action == "check")
+  //     {
+  //       if ((status >> 6) == 0) // ready
+  //       {
+  //         uint8_t item_1 = (uint8_t)status & 0b0111;
+  //         uint8_t item_2 = ((uint8_t)status & 0b111000) >> 3;
+  //         String response = "[\"ready\",11item_111,11item_211]";
+  //         response.replace("11item_111", String(item_1));
+  //         response.replace("11item_211", String(item_2));
+  //         temp_client->println(response.c_str());
+  //         temp_client->println();
+  //       }
+  //       else if ((status >> 6) == 1) // occupy
+  //       {
+  //         uint8_t item_1 = (uint8_t)status & 0b0111;
+  //         uint8_t item_2 = ((uint8_t)status & 0b111000) >> 3;
+  //         String response = "[\"pending\",11item_111,11item_211]";
+  //         response.replace("11item_111", String(item_1));
+  //         response.replace("11item_211", String(item_2));
+  //         temp_client->println(response.c_str());
+  //         temp_client->println();
+  //       }
+  //       else // error
+  //       {
+  //         temp_client->println("[\"error\",0,0]");
+  //         temp_client->println();
+  //       }
+  //     }
+  //     else if (action == "take")
+  //     {
+  //       if (status == (uint8_t)0b10000000) // ready
+  //       {
+  //         temp_client->println("[\"started\",0,0]");
+  //         temp_client->println();
+  //       }
+  //       else // error
+  //       {
+  //         temp_client->println("[\"error\",0,0]");
+  //         temp_client->println();
+  //       }
+  //     }
+  //     action = "";
+  //     temp_client->stop();
+  //     Serial.println("api");
+  //     temp_client = NULL;
+  //   }
+  // }
 
   // for (int i; i < 5; i++) {
   //   showText(text[i]);
