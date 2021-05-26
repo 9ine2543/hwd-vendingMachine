@@ -689,12 +689,12 @@ void setup()
 
   display.display();
 }
-int count = 0;
+int count = 4;
 void loop()
 {
-  while(Serial1.available() > 0 && count == 0){
+  while(Serial1.available() > 0 && count != 0){
     Serial.print(Serial1.read(),2);
-    count++;
+    count--;
   }
   WiFiClient client = server.available(); // Listen for incoming clients
 
