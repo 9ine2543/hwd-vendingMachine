@@ -117,6 +117,15 @@
             return "error"
         }
     }
+    const stepper_interval = 300;
+    function intervaler() {
+        let id = setInterval(async () => {
+            status = await getStatus()
+            if (status === 'ready' || status === 'error') {
+                clearInterval(id)
+            }
+        }, stepper_interval);
+    }
     async function selectItem(num) {
         try {
             const res = await fetch(`http://STEALURIP/take/${num}`)
