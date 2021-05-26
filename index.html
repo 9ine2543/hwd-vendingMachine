@@ -125,10 +125,10 @@
             } else if (data[0] === 'error') {
                 setError()
             }
+            return data[0];
         } catch {
             setError()
         }
-        return data[0];
     }
     async function itemSelect1(e) {
         if (!e.classList.contains('disable')) {
