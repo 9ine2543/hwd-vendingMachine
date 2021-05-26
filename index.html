@@ -129,6 +129,7 @@
             status = await getStatus()
             if (status === 'ready' || status === 'error') {
                 clearInterval(id)
+                isSelf = false
             }
         }, stepper_interval);
     }
