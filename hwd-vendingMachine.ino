@@ -584,6 +584,8 @@ void setup()
 {
   Serial.begin(115200);
   Serial1.begin(10000);
+  Serial1.write(0b00001000);
+  
   pinMode(output2, OUTPUT);
   digitalWrite(output2, LOW);
 
@@ -659,13 +661,16 @@ void loop()
 {
   WiFiClient client = server.available(); // Listen for incoming clients
 
-  if (client)
+  if (client )
   { // If a new client connects,
+    if(temp_client != NULL){
+        client.stop();//refuse new connection      
+    }else{
     currentTime = millis();
     previousTime = currentTime;
     Serial.println("New Client."); // print a message out in the serial port
     String currentLine = "";       // make a String to hold incoming data from the client
-    while (client.connected() && temp_client == NULL && currentTime - previousTime <= timeoutTime)
+    while (client.connected() && currentTime - previousTime <= timeoutTime)
     { // loop while the client's connected
       currentTime = millis();
       if (client.available())
@@ -748,17 +753,18 @@ void loop()
       Serial.println("Client disconnected.");
       Serial.println("");
     }
+    }
   }
   while (Serial1.available() && temp_client != NULL)
   {
-    int status = Serial1.read();
+    uint8_t status = Serial1.read();
     Serial.println(status, 2);
     if (action == "check")
     {
       if ((status >> 6) == 0) // ready
       {
-        int item_1 = (int)status & 0b0111;
-        int item_2 = ((int)status & 0b111000) >> 3;
+        uint8_t item_1 = (uint8_t)status & 0b0111;
+        uint8_t item_2 = ((uint8_t)status & 0b111000) >> 3;
         String response = "[\"ready\",11item_111,11item_211]"; 
         response.replace("11item_111",String(item_1));
         response.replace("11item_211",String(item_2));
@@ -767,8 +773,8 @@ void loop()
       }
       else if ((status >> 6) == 1) // occupy
       {
-        int item_1 = (int)status & 0b0111;
-        int item_2 = ((int)status & 0b111000) >> 3;
+        uint8_t item_1 = (uint8_t)status & 0b0111;
+        uint8_t item_2 = ((uint8_t)status & 0b111000) >> 3;
         String response = "[\"pending\",11item_111,11item_211]"; 
         response.replace("11item_111",String(item_1));
         response.replace("11item_211",String(item_2));
@@ -783,7 +789,7 @@ void loop()
     }
     else if (action == "take")
     {
-      if (status == (int)0b10000000) // ready
+      if (status == (uint8_t)0b10000000) // ready
       {
         temp_client->println("[\"ready\",0,0]");
         temp_client->println();
