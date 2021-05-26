@@ -562,8 +562,8 @@ const int led = 2;
 
 int count_trash = 2;
 
-#define SCREEN_WIDTH 128  // OLED display width, in pixels
-#define SCREEN_HEIGHT 64  // OLED display height, in pixels
+#define SCREEN_WIDTH 128 // OLED display width, in pixels
+#define SCREEN_HEIGHT 64 // OLED display height, in pixels
 
 // set the LCD number of columns and rows
 int lcdColumns = 16;
@@ -571,8 +571,8 @@ int lcdRows = 2;
 
 LiquidCrystal_I2C lcd(0x3F, lcdColumns, lcdRows);
 
-#define OLED_RESET -1        // Reset pin # (or -1 if sharing Arduino reset pin)
-#define SCREEN_ADDRESS 0x3C  ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
+#define OLED_RESET -1       // Reset pin # (or -1 if sharing Arduino reset pin)
+#define SCREEN_ADDRESS 0x3C ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
 
 #define OLED_SDA 21
 #define OLED_SCL 22
@@ -580,9 +580,10 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 QRCode qrcode;
 
-String text[] = { "Welcome <3", "Delivering...", "Select your item", "Item delivered!", "Temp. Closed" };
+String text[] = {"Welcome <3", "Delivering...", "Select your item", "Item delivered!", "Temp. Closed"};
 
-void setup() {
+void setup()
+{
   Serial.begin(115200);
   Serial1.begin(10000);
 
@@ -590,14 +591,15 @@ void setup() {
   digitalWrite(output2, LOW);
 
   // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
-  if (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
+  if (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS))
+  {
     Serial.println(F("SSD1306 allocation failed"));
     for (;;)
-      ;  // Don't proceed, loop forever
+      ; // Don't proceed, loop forever
   }
 
   display.display();
-  delay(1000);  // Pause for 2 seconds
+  delay(1000); // Pause for 2 seconds
 
   // Clear the buffer
   display.clearDisplay();
@@ -617,7 +619,8 @@ void setup() {
   Serial.print("Connecting to ");
   Serial.println(ssid);
   WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
+  while (WiFi.status() != WL_CONNECTED)
+  {
     delay(500);
     Serial.print(".");
   }
@@ -636,9 +639,12 @@ void setup() {
          * ส่วนที่จะแสดง QR-code ให้เป็นสีขาว (หน้าจอจะออกเป็นสีตามเม็ดสีบน oled ซึ่งคือสีฟ้า)
          */
   display.fillRect(0, 0, 128, 64, WHITE);
-  for (uint8_t y = 0; y < qrcode.size; y++) {
-    for (uint8_t x = 0; x < qrcode.size; x++) {
-      if (qrcode_getModule(&qrcode, x, y)) {
+  for (uint8_t y = 0; y < qrcode.size; y++)
+  {
+    for (uint8_t x = 0; x < qrcode.size; x++)
+    {
+      if (qrcode_getModule(&qrcode, x, y))
+      {
         /*
                * วาด Rectangle ขนาด 2x2 ในแต่ละตำแหน่งของ qrcode บนหน้าจอ 
                 โดยวางมุมซ้ายบนสุดของ QR-Code ไว้ที่พิกัด (39, 18)
@@ -652,41 +658,69 @@ void setup() {
   display.display();
 }
 
-void loop() {
-  WiFiClient client = server.available();  // Listen for incoming clients
+void loop()
+{
+  WiFiClient client = server.available(); // Listen for incoming clients
 
-  if (client) {  // If a new client connects,
-    if (temp_client != NULL) {
-      client.stop();  //refuse new connection
-    } else {
+  if (client)
+  { // If a new client connects,
+    if (temp_client != NULL)
+    {
+      client.stop(); //refuse new connection
+    }
+    else
+    {
       currentTime = millis();
       previousTime = currentTime;
-      Serial.println("New Client.");                                             // print a message out in the serial port
-      String currentLine = "";                                                   // make a String to hold incoming data from the client
-      while (client.connected() && currentTime - previousTime <= timeoutTime) {  // loop while the client's connected
+      Serial.println("New Client."); // print a message out in the serial port
+      String currentLine = "";       // make a String to hold incoming data from the client
+      while (client.connected() && currentTime - previousTime <= timeoutTime)
+      { // loop while the client's connected
         currentTime = millis();
-        if (client.available()) {  // if there's bytes to read from the client,
-          char c = client.read();  // read a byte, then
+        if (client.available())
+        {                         // if there's bytes to read from the client,
+          char c = client.read(); // read a byte, then
           //Serial.write(c);
           // delay(1); // print it out the serial monitor
           header += c;
-          if (c == '\n') {  // if the byte is a newline character
+          if (c == '\n')
+          { // if the byte is a newline character
             // if the current line is blank, you got two newline characters in a row.
             // that's the end of the client HTTP request, so send a response:
-            if (currentLine.length() == 0) {
+            if (currentLine.length() == 0)
+            {
               // HTTP headers always start with a response code (e.g. HTTP/1.1 200 OK)
               // and a content-type so the client knows what's coming, then a blank line:
               client.println("HTTP/1.1 200 OK");
 
               // turns the GPIOs on and off
-              if (header.indexOf("/status") >= 0) {
+              if (header.indexOf("/status") >= 0)
+              {
                 client.println("Content-type:application/json");
                 client.println("Connection: close");
                 client.println();
-                Serial1.write(0b00001000);  //check status
-                temp_client = &client;
-                action = "check";
-              } else if (header.indexOf("/take/1") >= 0)  // get item 1
+                Serial1.write(0b00001000); //check status
+                // temp_client = &client;
+                // action = "check";
+                while (true)
+                {
+                  if (Serial1.available() > 0)
+                  {
+                    int status = Serial1.read();
+                    if ((status >> 6) == 0) // ready
+                    {
+                      uint8_t item_1 = (uint8_t)status & 0b0111;
+                      uint8_t item_2 = ((uint8_t)status & 0b111000) >> 3;
+                      String response = "[\"ready\",11item_111,11item_211]";
+                      response.replace("11item_111", String(item_1));
+                      response.replace("11item_211", String(item_2));
+                      client.println(response.c_str());
+                      client.println();
+                    }
+                  }
+                }
+              }
+              else if (header.indexOf("/take/1") >= 0) // get item 1
               {
                 client.println("Content-type:application/json");
                 client.println("Connection: close");
@@ -694,7 +728,8 @@ void loop() {
                 Serial1.write(0b10001000);
                 temp_client = &client;
                 action = "take";
-              } else if (header.indexOf("/take/2") >= 0)  // get item 2
+              }
+              else if (header.indexOf("/take/2") >= 0) // get item 2
               {
                 client.println("Content-type:application/json");
                 client.println("Connection: close");
@@ -702,7 +737,9 @@ void loop() {
                 Serial1.write(0b10010000);
                 temp_client = &client;
                 action = "take";
-              } else {
+              }
+              else
+              {
                 String html = String(c_html);
                 html.replace("STEALURIP", WiFi.localIP().toString().c_str());
                 // display page
@@ -715,11 +752,15 @@ void loop() {
                 client.println();
               }
               break;
-            } else {  // if you got a newline, then clear currentLine
+            }
+            else
+            { // if you got a newline, then clear currentLine
               currentLine = "";
             }
-          } else if (c != '\r') {  // if you got anything else but a carriage return character,
-            currentLine += c;      // add it to the end of the currentLine
+          }
+          else if (c != '\r')
+          {                   // if you got anything else but a carriage return character,
+            currentLine += c; // add it to the end of the currentLine
           }
         }
       }
@@ -727,7 +768,8 @@ void loop() {
       header = "";
       // Close the connection
 
-      if (temp_client == NULL) {
+      if (temp_client == NULL)
+      {
         Serial.println("WEB");
         client.stop();
         Serial.println("Client disconnected.");
@@ -736,12 +778,15 @@ void loop() {
     }
   }
 
-  if (Serial1.available() > 0) {
-    if (temp_client != NULL && action != "") {
+  if (Serial1.available() > 0)
+  {
+    if (temp_client != NULL && action != "")
+    {
       uint8_t status = Serial1.read();
       Serial.println(status, 2);
-      if (action == "check") {
-        if ((status >> 6) == 0)  // ready
+      if (action == "check")
+      {
+        if ((status >> 6) == 0) // ready
         {
           uint8_t item_1 = (uint8_t)status & 0b0111;
           uint8_t item_2 = ((uint8_t)status & 0b111000) >> 3;
@@ -750,7 +795,8 @@ void loop() {
           response.replace("11item_211", String(item_2));
           temp_client->println(response.c_str());
           temp_client->println();
-        } else if ((status >> 6) == 1)  // occupy
+        }
+        else if ((status >> 6) == 1) // occupy
         {
           uint8_t item_1 = (uint8_t)status & 0b0111;
           uint8_t item_2 = ((uint8_t)status & 0b111000) >> 3;
@@ -759,17 +805,21 @@ void loop() {
           response.replace("11item_211", String(item_2));
           temp_client->println(response.c_str());
           temp_client->println();
-        } else  // error
+        }
+        else // error
         {
           temp_client->println("[\"error\",0,0]");
           temp_client->println();
         }
-      } else if (action == "take") {
-        if (status == (uint8_t)0b10000000)  // ready
+      }
+      else if (action == "take")
+      {
+        if (status == (uint8_t)0b10000000) // ready
         {
           temp_client->println("[\"started\",0,0]");
           temp_client->println();
-        } else  // error
+        }
+        else // error
         {
           temp_client->println("[\"error\",0,0]");
           temp_client->println();
@@ -787,7 +837,8 @@ void loop() {
   // }
 }
 
-void showText(String text) {
+void showText(String text)
+{
   lcd.setCursor(0, 0);
 
   lcd.print(text);
@@ -796,5 +847,6 @@ void showText(String text) {
   lcd.clear();
 }
 
-void serialEvent() {
+void serialEvent()
+{
 }
