@@ -100,8 +100,6 @@
 
     async function getStatus() {
         try {
-            await fetch('http://STEALURIP/status')
-            await fetch('http://STEALURIP/status')
             const res = await fetch('http://STEALURIP/status')
             const data = await res.json()
             if (data[0] === 'ready') {
