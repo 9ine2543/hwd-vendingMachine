@@ -17,7 +17,7 @@
         </h1>
     </header>
     <section>
-        <div class='bar occupy'>เครื่องไม่ว่าง</div>
+        <div class='bar ready'>พร้อม</div>
         <div class='zone'>
             <div class='item-btn' onclick='itemSelect1(this)'>
                 <img src='https://backend.tops.co.th/media/catalog/product/8/8/8858998581153_1.jpg' alt='pepsi'>
@@ -52,6 +52,15 @@
             noti.classList.remove('delivering')
             noti.classList.add('occupy')
             noti.innerHTML = 'เครื่องไม่ว่าง'
+        }
+    }
+    function setNoItem() {
+        let noti = document.querySelector('.bar')
+        if (noti) {
+            noti.classList.remove('ready')
+            noti.classList.remove('delivering')
+            noti.classList.add('occupy')
+            noti.innerHTML = 'ไม่มีของ'
         }
     }
     function setError() {
@@ -108,14 +117,12 @@
     async function selectItem(num) {
         const res = await fetch(`http://STEALURIP/take/${num}`)
         const data = await res.json()
-        if (data.status === 'started') {
+        if (data[0] === 'started') {
             setDelivering()
-        } else if (data.status === 'pending') {
-            setOccupy()
-        } else if (data.status === 'error') {
+        } else if (data[0] === 'error') {
             setError()
         }
-        return data.status;
+        return data[0];
     }
     async function itemSelect1(e) {
         if (!e.classList.contains('disable')) {

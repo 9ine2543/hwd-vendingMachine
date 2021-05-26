@@ -39,8 +39,8 @@ const char* c_html = "<!DOCTYPE html>\r\n"
    "    </header>\r\n"
    "    <section>\r\n"
    "        <div class="
-   "\'bar occupy\'>เครื่"
-   "องไม่ว่าง</div>\r\n"
+   "\'bar ready\'>พร้อม<"
+   "/div>\r\n"
    "        <div class="
    "\'zone\'>\r\n"
    "            <div cla"
@@ -124,6 +124,27 @@ const char* c_html = "<!DOCTYPE html>\r\n"
    "            noti.inn"
    "erHTML = \'เครื่องไม"
    "่ว่าง\'\r\n"
+   "        }\r\n"
+   "    }\r\n"
+   "    function setNoIt"
+   "em() {\r\n"
+   "        let noti = d"
+   "ocument.querySelecto"
+   "r(\'.bar\')\r\n"
+   "        if (noti) {"
+   "\r\n"
+   "            noti.cla"
+   "ssList.remove(\'read"
+   "y\')\r\n"
+   "            noti.cla"
+   "ssList.remove(\'deli"
+   "vering\')\r\n"
+   "            noti.cla"
+   "ssList.add(\'occupy"
+   "\')\r\n"
+   "            noti.inn"
+   "erHTML = \'ไม่มีของ"
+   "\'\r\n"
    "        }\r\n"
    "    }\r\n"
    "    function setErro"
@@ -248,24 +269,19 @@ const char* c_html = "<!DOCTYPE html>\r\n"
    "        const data ="
    " await res.json()\r"
    "\n"
-   "        if (data.sta"
-   "tus === \'started\')"
-   " {\r\n"
+   "        if (data[0] "
+   "=== \'started\') {\r"
+   "\n"
    "            setDeliv"
    "ering()\r\n"
    "        } else if (d"
-   "ata.status === \'pen"
-   "ding\') {\r\n"
-   "            setOccup"
-   "y()\r\n"
-   "        } else if (d"
-   "ata.status === \'err"
-   "or\') {\r\n"
+   "ata[0] === \'error\'"
+   ") {\r\n"
    "            setError"
    "()\r\n"
    "        }\r\n"
-   "        return data."
-   "status;\r\n"
+   "        return data["
+   "0];\r\n"
    "    }\r\n"
    "    async function i"
    "temSelect1(e) {\r\n"
@@ -507,8 +523,8 @@ const char* c_html = "<!DOCTYPE html>\r\n"
    "    }\r\n"
    "</style>\r\n\r\n"
    "</html>";
-const char *ssid = "Haruk";
-const char *password = "10001000";
+const char *ssid = "N19EENIN";
+const char *password = "Nine06012000";
 
 // Set web server port number to 80
 WiFiServer server(80);
@@ -517,7 +533,8 @@ WiFiServer server(80);
 String header;
 String output2State = "off";
 const int output2 = 2;
-
+WiFiClient *temp_client;
+String action = "";
 // Current time
 unsigned long currentTime = millis();
 // Previous time
@@ -550,7 +567,7 @@ String text[] = {"Welcome <3", "Delivering...", "Select your item", "Item delive
 void setup()
 {
   Serial.begin(115200);
-
+  Serial1.begin(10000);
   pinMode(output2, OUTPUT);
   digitalWrite(output2, LOW);
 
@@ -639,7 +656,7 @@ void loop()
       {                         // if there's bytes to read from the client,
         char c = client.read(); // read a byte, then
         Serial.write(c);
-        delay(1); // print it out the serial monitor
+        // delay(1); // print it out the serial monitor
         header += c;
         if (c == '\n')
         { // if the byte is a newline character
@@ -657,77 +674,32 @@ void loop()
               client.println("Content-type:application/json");
               client.println("Connection: close");
               client.println();
-              Serial.print(0b00001000); //check status
-              delay(300);
-              if (Serial.available())
-              {
-                int status = Serial.read();
-                if (status == (int)0b00011001) // ready
-                {
-                  client.println("{\"status\" : \"ready\" }");
-                  client.println();
-                }
-                else if (status == (int)0b01000000) // occupy
-                {
-                  client.println("{\"status\" : \"pending\" }");
-                  client.println();
-                }
-                else // error
-                {
-                  client.println("{\"status\" : \"error\" }");
-                  client.println();
-                }
-              }
+              Serial1.write(0b00001000); //check status
+              temp_client = &client;
+              action = "check";
             }
-            if (header.indexOf("/take") >= 0)
+            else if (header.indexOf("/take/1") >= 0) // get item 1
             {
               client.println("Content-type:application/json");
               client.println("Connection: close");
-              Serial.print(0b00001000); //check status
-              delay(300);
-              if (Serial.available())
-              {
-                /* code */
-                int status = Serial.read();
-                if (status == (int)0b00011001) // ready
-                {
-                  if (header.indexOf("/take/1") >= 0) // get item 1
-                  {
-                    Serial.print(0b10001000);
-                  }
-                  else if (header.indexOf("/take/2") >= 0) // get item 2
-                  {
-                    Serial.print(0b10010000);
-                  }
-                  delay(300);
-                  int response = Serial.read();
-                  if (response == (int)0b10000000) //started
-                  {
-                    client.println("{\"status\" : \"started\" }");
-                    client.println();
-                  }
-                  else // error
-                  {
-                    client.println("{\"status\" : \"error\" }");
-                    client.println();
-                  }
-                }
-                else if (status == (int)0b01000000) // occupy
-                {
-                  client.println("{\"status\" : \"pending\" }");
-                  client.println();
-                }
-                else // error
-                {
-                  client.println("{\"status\" : \"error\" }");
-                  client.println();
-                }
-              }
+              client.println();
+              Serial1.write(0b10001000);
+              temp_client = &client;
+              action = "take";
+            }
+            else if (header.indexOf("/take/2") >= 0) // get item 2
+            {
+              client.println("Content-type:application/json");
+              client.println("Connection: close");
+              client.println();
+              Serial1.write(0b10010000);
+              temp_client = &client;
+              action = "take";
             }
             else
             {
               String html = String(c_html);
-              html.replace("STEALURIP",WiFi.localIP().toString().c_str());
+              html.replace("STEALURIP", WiFi.localIP().toString().c_str());
               // display page
               client.println("Content-type:text/html");
               client.println("Connection: close");
@@ -753,9 +725,61 @@ void loop()
     // Clear the header variable
     header = "";
     // Close the connection
-    client.stop();
-    Serial.println("Client disconnected.");
-    Serial.println("");
+
+    if (temp_client == NULL)
+    {
+      client.stop();
+      Serial.println("Client disconnected.");
+      Serial.println("");
+    }
+  }
+  while (Serial1.available() && temp_client != NULL)
+  {
+    int status = Serial1.read();
+    Serial.println(status, 2);
+    if (action == "check")
+    {
+      if (status == (int)0b00011001) // ready
+      {
+        int item_1 = (int)status & 0b0111;
+        int item_2 = ((int)status & 0b111000) >> 3;
+        String response = "[\"ready\",11item_111,11item_211]"; 
+        response.replace("11item_111",String(item_1));
+        response.replace("11item_211",String(item_2));
+        temp_client->println(response.c_str());
+        temp_client->println();
+      }
+      else if (status == (int)0b01000000) // occupy
+      {
+        int item_1 = (int)status & 0b0111;
+        int item_2 = ((int)status & 0b111000) >> 3;
+        String response = "[\"pending\",11item_111,11item_211]"; 
+        response.replace("11item_111",String(item_1));
+        response.replace("11item_211",String(item_2));
+        temp_client->println(response.c_str());
+        temp_client->println();
+      }
+      else // error
+      {
+        temp_client->println("[\"error\",0,0]");
+        temp_client->println();
+      }
+    }
+    else if (action == "take")
+    {
+      if (status == (int)0b10000000) // ready
+      {
+        temp_client->println("[\"ready\",0,0]");
+        temp_client->println();
+      }
+      else // error
+      {
+        temp_client->println("[\"error\",0,0]");
+        temp_client->println();
+      }
+    }
+    temp_client->stop();
+    temp_client = NULL;
   }
 
   for (int i; i < 5; i++)
