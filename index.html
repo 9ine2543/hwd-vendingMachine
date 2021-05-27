@@ -156,6 +156,7 @@
             if (status === 'ready') {
                 setReady()
                 status = await selectItem(1)
+                setDelivering()
                 isSelf = true;
                 setTimeout(() => {
                     intervaler()
@@ -181,6 +182,7 @@
             if (status === 'ready') {
                 setReady()
                 status = await selectItem(2)
+                setDelivering()
                 isSelf = true;
                 setTimeout(() => {
                     intervaler()
