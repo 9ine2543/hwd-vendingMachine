@@ -821,14 +821,13 @@ void loop()
                 {
                   if (Serial1.available() > 0)
                   {
-                    showText(text[4]);                    
+                    showText(text[1]);                    
                     int status = Serial1.read();
                     Serial.print(status, 2);
                     if (status == (uint8_t)0b10000000) // ready
                     {
                       client.println("[\"started\",0,0]");
                       client.println();
-                      showText(text[2]);
                       isDerivering = true;
                     }
                     else // error
@@ -857,8 +856,7 @@ void loop()
                     if (status == (uint8_t)0b10000000) // ready
                     {
                       client.println("[\"started\",0,0]");
-                      client.println();
-                      showText(text[2]);     
+                      client.println();  
                       isDerivering = true;
                     }
                     else // error
