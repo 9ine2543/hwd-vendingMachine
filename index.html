@@ -126,12 +126,14 @@
     const stepper_interval = 2000;
     function intervaler() {
         let id = setInterval(async () => {
-            process = false
-            status = await getStatus()
-            process = true
+            if (!process) {
+                process = true
+                status = await getStatus()
+            }
             if (status === 'ready' || status === 'error') {
                 clearInterval(id)
                 isSelf = false
+                process = false;
             }
         }, stepper_interval);
     }
