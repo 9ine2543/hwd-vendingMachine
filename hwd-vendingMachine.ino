@@ -776,13 +776,20 @@ void loop()
                 {
                   if (Serial1.available() > 0)
                   {
-                    int status = Serial1.read();
+                    uint8_t status = Serial1.read();
                     Serial.print(status, 2);
                     if ((status >> 6) == 0) // ready
                     {
-
-                      uint8_t item_1 = (uint8_t)status & 0b0111;
-                      uint8_t item_2 = ((uint8_t)status & 0b111000) >> 3;
+                      uint8_t temp_1 = status & 0b0111;
+                      uint8_t item_1 = 0;
+                      if(temp_1 == 1) item_1=1;
+                      if(temp_1 == 3) item_1=2;
+                      if(temp_1 == 7) item_1=3;
+                      uint8_t temp_2 = (status & 0b111000) >> 3;
+                      uint8_t item_2 = 0;
+                      if(temp_2 == 1) item_2=1;
+                      if(temp_2 == 3) item_2=2;
+                      if(temp_2 == 7) item_2=3;
                       String response = "[\"ready\",11item_111,11item_211]";
                       response.replace("11item_111", String(item_1));
                       response.replace("11item_211", String(item_2));
@@ -797,11 +804,7 @@ void loop()
                     }
                     else if ((status >> 6) == 1) // occupy
                     {
-                      uint8_t item_1 = (uint8_t)status & 0b0111;
-                      uint8_t item_2 = ((uint8_t)status & 0b111000) >> 3;
-                      String response = "[\"pending\",11item_111,11item_211]";
-                      response.replace("11item_111", String(item_1));
-                      response.replace("11item_211", String(item_2));
+                      String response = "[\"pending\",0,0]";
                       client.println(response.c_str());
                       client.println();
                       showText(text[1]);
@@ -827,14 +830,13 @@ void loop()
                 {
                   if (Serial1.available() > 0)
                   {
-                    showText(text[4]);                    
+                    showText(text[1]);                    
                     int status = Serial1.read();
                     Serial.print(status, 2);
                     if (status == (uint8_t)0b10000000) // ready
                     {
                       client.println("[\"started\",0,0]");
                       client.println();
-                      showText(text[2]);
                       isDerivering = true;
                     }
                     else // error
@@ -863,8 +865,7 @@ void loop()
                     if (status == (uint8_t)0b10000000) // ready
                     {
                       client.println("[\"started\",0,0]");
-                      client.println();
-                      showText(text[2]);     
+                      client.println();  
                       isDerivering = true;
                     }
                     else // error
@@ -916,70 +917,12 @@ void loop()
     }
   }
 
-  // if (Serial1.available() > 0)
-  // {
-  //   if (temp_client != NULL && action != "")
-  //   {
-  //     uint8_t status = Serial1.read();
-  //     Serial.println(status, 2);
-  //     if (action == "check")
-  //     {
-  //       if ((status >> 6) == 0) // ready
-  //       {
-  //         uint8_t item_1 = (uint8_t)status & 0b0111;
-  //         uint8_t item_2 = ((uint8_t)status & 0b111000) >> 3;
-  //         String response = "[\"ready\",11item_111,11item_211]";
-  //         response.replace("11item_111", String(item_1));
-  //         response.replace("11item_211", String(item_2));
-  //         temp_client->println(response.c_str());
-  //         temp_client->println();
-  //       }
-  //       else if ((status >> 6) == 1) // occupy
-  //       {
-  //         uint8_t item_1 = (uint8_t)status & 0b0111;
-  //         uint8_t item_2 = ((uint8_t)status & 0b111000) >> 3;
-  //         String response = "[\"pending\",11item_111,11item_211]";
-  //         response.replace("11item_111", String(item_1));
-  //         response.replace("11item_211", String(item_2));
-  //         temp_client->println(response.c_str());
-  //         temp_client->println();
-  //       }
-  //       else // error
-  //       {
-  //         temp_client->println("[\"error\",0,0]");
-  //         temp_client->println();
-  //       }
-  //     }
-  //     else if (action == "take")
-  //     {
-  //       if (status == (uint8_t)0b10000000) // ready
-  //       {
-  //         temp_client->println("[\"started\",0,0]");
-  //         temp_client->println();
-  //       }
-  //       else // error
-  //       {
-  //         temp_client->println("[\"error\",0,0]");
-  //         temp_client->println();
-  //       }
-  //     }
-  //     action = "";
-  //     temp_client->stop();
-  //     Serial.println("api");
-  //     temp_client = NULL;
-  //   }
-  // }
-
-  // for (int i; i < 5; i++) {
-  //   showText(text[i]);
-  // }
 }
 
 void showText(String text)
 {
   lcd.clear();
   lcd.setCursor(0, 0);
-
   lcd.print(text);
 }
 
