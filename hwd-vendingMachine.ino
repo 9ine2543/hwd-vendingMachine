@@ -596,8 +596,8 @@ char* c_html = "<!DOCTYPE html>\r\n"
    "    }\r\n"
    "</style>\r\n\r\n"
    "</html>";
-const char *ssid = "N19EENIN";
-const char *password = "Nine06012000";
+const char *ssid = "Haruk";
+const char *password = "10001000";
 
 // Set web server port number to 80
 WiFiServer server(80);
@@ -668,7 +668,7 @@ void setup()
   // Serial.println(display.height());
   // turn on LCD backlight
   lcd.backlight();
-
+  showText(text[0]);
   // Clear the buffer
   // display.clearDisplay();
 
@@ -691,6 +691,7 @@ void setup()
   qrcode_initText(&qrcode, qrcodeBytes, 2, ECC_LOW, ("http://" + WiFi.localIP().toString()).c_str());
 
   display.clearDisplay();
+  Serial.println("start qr");
   /*
          * QR-code ต้องมีพื้นที่สีสว่างกว่าตัว block ของ code เลยต้องถม background 
          * ส่วนที่จะแสดง QR-code ให้เป็นสีขาว (หน้าจอจะออกเป็นสีตามเม็ดสีบน oled ซึ่งคือสีฟ้า)
@@ -709,12 +710,12 @@ void setup()
         display.fillRect(x * 2 + 39, y * 2 + 7, 2, 2, BLACK);
       }
     }
-    Serial.print("\n");
   }
 
   display.display();
 }
 int count = 5;
+bool isDerivering = false;
 void loop()
 {
   while(Serial1.available() > 0 && count != 0){
@@ -761,8 +762,6 @@ void loop()
                 client.println("Connection: close");
                 client.println();
                 Serial1.write(0b00001000); //check status
-                // temp_client = &client;
-                // action = "check";
                 while (true)
                 {
                   if (Serial1.available() > 0)
@@ -771,6 +770,7 @@ void loop()
                     Serial.print(status, 2);
                     if ((status >> 6) == 0) // ready
                     {
+
                       uint8_t item_1 = (uint8_t)status & 0b0111;
                       uint8_t item_2 = ((uint8_t)status & 0b111000) >> 3;
                       String response = "[\"ready\",11item_111,11item_211]";
@@ -778,6 +778,12 @@ void loop()
                       response.replace("11item_211", String(item_2));
                       client.println(response.c_str());
                       client.println();
+                      if(isDerivering){
+                        showText(text[3]);
+                        isDerivering = false;
+                      }else{
+                        showText(text[2]);
+                      }
                     }
                     else if ((status >> 6) == 1) // occupy
                     {
@@ -788,12 +794,14 @@ void loop()
                       response.replace("11item_211", String(item_2));
                       client.println(response.c_str());
                       client.println();
+                      showText(text[1]);
                     }
                     else // error
                     {
                       client.println("[\"error\",0,0]");
-                      client.println();
-                    }
+                      client.println();                  
+                      showText(text[4]);                    
+                      }
                     break;
                   }
                 }
@@ -803,22 +811,27 @@ void loop()
                 client.println("Content-type:application/json");
                 client.println("Connection: close");
                 client.println();
+                showText(text[1]);                    
                 Serial1.write(0b10001000);
                 while (true)
                 {
                   if (Serial1.available() > 0)
                   {
+                    showText(text[4]);                    
                     int status = Serial1.read();
                     Serial.print(status, 2);
                     if (status == (uint8_t)0b10000000) // ready
                     {
                       client.println("[\"started\",0,0]");
                       client.println();
+                      showText(text[2]);
+                      isDerivering = true;
                     }
                     else // error
                     {
                       client.println("[\"error\",0,0]");
                       client.println();
+                      showText(text[4]);                    
                     }
                     break;
                   }
@@ -829,7 +842,8 @@ void loop()
                 client.println("Content-type:application/json");
                 client.println("Connection: close");
                 client.println();
-                Serial1.write(0b10010000);
+                showText(text[1]);                    
+                Serial1.write(0b10010000);                  
                 while (true)
                 {
                   if (Serial1.available() > 0)
@@ -840,11 +854,14 @@ void loop()
                     {
                       client.println("[\"started\",0,0]");
                       client.println();
+                      showText(text[2]);     
+                      isDerivering = true;
                     }
                     else // error
                     {
                       client.println("[\"error\",0,0]");
                       client.println();
+                      showText(text[4]);                      
                     }
                     break;
                   }
@@ -863,6 +880,8 @@ void loop()
 
                 client.println();
                 Serial.println("WEB");
+                lcd.clear();
+                lcd.print(text[2]);
               }
               break;
             }
@@ -948,12 +967,10 @@ void loop()
 
 void showText(String text)
 {
+  lcd.clear();
   lcd.setCursor(0, 0);
 
   lcd.print(text);
-
-  delay(1000);
-  lcd.clear();
 }
 
 void serialEvent()
