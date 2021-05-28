@@ -423,7 +423,7 @@ char* c_html = "<!DOCTYPE html>\r\n"
    "                setE"
    "rror()\r\n"
    "                setD"
-   "isable(1,false)\r\n"
+   "isable(1)\r\n"
    "            }\r\n"
    "        }\r\n"
    "    }\r\n"
@@ -477,7 +477,7 @@ char* c_html = "<!DOCTYPE html>\r\n"
    "                setE"
    "rror()\r\n"
    "                setD"
-   "isable(2,false)\r\n"
+   "isable(2)\r\n"
    "            }\r\n"
    "        }\r\n"
    "    }\r\n"
@@ -815,13 +815,13 @@ void loop()
                     {
                       uint8_t temp_1 = status & 0b0111;
                       uint8_t item_1 = 0;
-                      if(temp_1 == 1) item_1=1;
-                      if(temp_1 == 3) item_1=2;
+                      if(temp_1 == 4) item_1=1;
+                      if(temp_1 == 6) item_1=2;
                       if(temp_1 == 7) item_1=3;
                       uint8_t temp_2 = (status & 0b111000) >> 3;
                       uint8_t item_2 = 0;
-                      if(temp_2 == 1) item_2=1;
-                      if(temp_2 == 3) item_2=2;
+                      if(temp_2 == 4) item_2=1;
+                      if(temp_2 == 6) item_2=2;
                       if(temp_2 == 7) item_2=3;
                       String response = "[\"ready\",11item_111,11item_211]";
                       response.replace("11item_111", String(item_1));
