@@ -104,6 +104,7 @@
             fetch('http://STEALURIP/status')
             const res = await fetch('http://STEALURIP/status')
             const data = await res.json()
+            count = [data[1], data[2]]
             if (data[0] === 'ready') {
                 setReady()
                 if (data[1] === 0 && data[2] === 0) {
@@ -128,6 +129,7 @@
     }
     let isSelf = false;
     let process = false;
+    let count = []
     const stepper_interval = 2000;
     function intervaler() {
         let id = setInterval(async () => {
@@ -138,8 +140,13 @@
             if (status === 'ready' || status === 'error') {
                 clearInterval(id)
                 isSelf = false
-                setDisable(1, false)
-                setDisable(2, false)
+                if (count[1] === 0 && count[2] === 0) {
+                    setDisable(1)
+                    setDisable(2)
+                } else {
+                    setDisable(1, false)
+                    setDisable(2, false)
+                }
             }
             process = false;
         }, stepper_interval);
