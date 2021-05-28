@@ -134,6 +134,8 @@
                 clearInterval(id)
                 isSelf = false
                 process = false;
+                setDisable(1, false)
+                setDisable(2, false)
             }
         }, stepper_interval);
     }
@@ -174,8 +176,6 @@
             } else if (status === 'error') {
                 setError()
             }
-            setDisable(1, false)
-            setDisable(2, false)
         }
     }
     async function itemSelect2(e) {
@@ -200,8 +200,6 @@
             } else if (status === 'error') {
                 setError()
             }
-            setDisable(1, false)
-            setDisable(2, false)
         }
     }
 </script>
