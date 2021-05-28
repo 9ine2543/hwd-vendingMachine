@@ -140,12 +140,13 @@
             if (status === 'ready' || status === 'error') {
                 clearInterval(id)
                 isSelf = false
-                if (count[1] === 0 && count[2] === 0) {
+                setDisable(1, false)
+                setDisable(2, false)
+                if (count[0] === 0) {
                     setDisable(1)
+                }
+                if (count[1] === 0) {
                     setDisable(2)
-                } else {
-                    setDisable(1, false)
-                    setDisable(2, false)
                 }
             }
             process = false;
