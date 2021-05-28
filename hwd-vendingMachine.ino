@@ -229,10 +229,10 @@ char* c_html = "<!DOCTYPE html>\r\n"
    "    async function g"
    "etStatus() {\r\n"
    "        try {\r\n"
-   "            fetch(\'"
+   "      await fetch(\'"
    "http://STEALURIP/sta"
    "tus\')\r\n"
-   "            fetch(\'"
+   "      await fetch(\'"
    "http://STEALURIP/sta"
    "tus\')\r\n"
    "            const re"
@@ -729,6 +729,7 @@ void setup()
 }
 int count = 5;
 bool isDerivering = false;
+int count2 = 2;
 void loop()
 {
   while(Serial1.available() > 0 && count != 0){
@@ -773,7 +774,7 @@ void loop()
               {
                 client.println("Content-type:application/json");
                 client.println("Connection: close");
-                client.println();
+                client.println();     
                 Serial1.write(0b00001000); //check status
                 while (true)
                 {
@@ -798,25 +799,31 @@ void loop()
                       response.replace("11item_211", String(item_2));
                       client.println(response.c_str());
                       client.println();
+                      client.stop();
                       if(isDerivering){
                         showText(text[3]);
                         isDerivering = false;
                       }else{
                         showText(text[2]);
                       }
+                      break;   
                     }
                     else if ((status >> 6) == 1) // occupy
                     {
                       String response = "[\"pending\",0,0]";
                       client.println(response.c_str());
                       client.println();
+                      client.stop();  
                       showText(text[1]);
+                      break; 
                     }
                     else // error
                     {
                       client.println("[\"error\",0,0]");
-                      client.println();                  
-                      showText(text[4]);                    
+                      client.println();      
+                      client.stop();             
+                      showText(text[4]);
+                      break;                    
                       }
                     break;
                   }
@@ -840,13 +847,17 @@ void loop()
                     {
                       client.println("[\"started\",0,0]");
                       client.println();
+                      client.stop();
                       isDerivering = true;
+                      break;
                     }
                     else // error
                     {
                       client.println("[\"error\",0,0]");
                       client.println();
-                      showText(text[4]);                    
+                      client.stop();     
+                      showText(text[4]); 
+                      break;                                         
                     }
                     break;
                   }
@@ -870,12 +881,16 @@ void loop()
                       client.println("[\"started\",0,0]");
                       client.println();  
                       isDerivering = true;
+                      client.stop();  
+                      break;
                     }
                     else // error
                     {
                       client.println("[\"error\",0,0]");
                       client.println();
-                      showText(text[4]);                      
+                      client.stop();     
+                      showText(text[4]); 
+                      break;
                     }
                     break;
                   }
@@ -893,6 +908,7 @@ void loop()
                 client.println(html.c_str());
 
                 client.println();
+                client.stop();  
                 Serial.println("WEB");
                 lcd.clear();
                 lcd.print(text[2]);
