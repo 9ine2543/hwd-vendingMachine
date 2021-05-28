@@ -172,7 +172,7 @@
             setDisable(1)
             setDisable(2)
             let status = await getStatus()
-            if (status === 'ready') {
+            if (status === 'ready' && count[0] !== 0) {
                 setReady()
                 status = await selectItem(1)
                 setDelivering()
@@ -185,8 +185,9 @@
                 setTimeout(() => {
                     intervaler()
                 }, 1000);
-            } else if (status === 'error') {
+            } else {
                 setError()
+                setDisable(1,false)
             }
         }
     }
@@ -196,7 +197,7 @@
             setDisable(1)
             setDisable(2)
             let status = await getStatus()
-            if (status === 'ready') {
+            if (status === 'ready' && count[1] !== 0) {
                 setReady()
                 status = await selectItem(2)
                 setDelivering()
@@ -209,8 +210,9 @@
                 setTimeout(() => {
                     intervaler()
                 }, 1000);
-            } else if (status === 'error') {
+            } else {
                 setError()
+                setDisable(2,false)
             }
         }
     }
